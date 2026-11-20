@@ -50,6 +50,10 @@ class Review(BaseModel):
     note: str = Field(default='',max_length=500)
 
 
+class Note(BaseModel):
+    note: str = Field(default='',max_length=500)
+
+
 def read_sample(name):
     choices = {'shift':'shift.csv','external':'external.csv'}
     if name not in choices:

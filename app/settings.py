@@ -12,4 +12,4 @@ ROLE = '园林养护验收员'
 UNIT = '元'
 RULE_VERSION = 'tree-warranty-1.0'
 SIGNATURE = '单株验收明细'
-TABS = {'intake': '巡检底单', 'contract': '物候字段', 'quality': '异常巡检', 'domain': '保活核款', 'reconcile': '养护台账', 'runs': '验收批次', 'review': '签收底稿'}
+TABS = {'intake': '巡检底单', 'contract': '物候字段', 'quality': '异常巡检', 'domain': '保活核款', 'reconcile': '养护台账', 'settle': '分期签收', 'runs': '验收批次', 'review': '签收底稿'}

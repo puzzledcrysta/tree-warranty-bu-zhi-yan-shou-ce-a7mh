@@ -7,6 +7,9 @@ def test_page_and_stages(client):
     for route,field in [('intake','encoding'),('contract','accepted'),('quality','ready'),('domain','accepted'),('reconcile','balanced')]:
         response = client.post(f'/api/{route}',json={})
         assert response.status_code == 200 and field in response.json()
+    run_id = client.post('/api/runs',json={}).json()['manifest']['run_id']
+    assert 'period' in client.get(f'/api/settle/{run_id}').json()
+    assert 'settle' in page.text
 
 
 def test_malformed_sample_can_retry(client):

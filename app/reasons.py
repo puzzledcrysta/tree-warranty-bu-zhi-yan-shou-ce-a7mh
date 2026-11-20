@@ -9,6 +9,8 @@ REASONS = {
     'AMOUNT_DELTA': '复算与外部账计量不同', 'BOOK_CONFLICT': '独立账含重复业务键',
     'RUN_UNKNOWN': '没有此批次', 'DEMO_UNKNOWN': '没有此样例', 'STALE': '复核版本已过期',
     'REVIEW_NOTE': '有差异时须填写复核意见', 'REVIEW_DECISION': '复核结论无效',
+    'PERIOD': '结算期格式无效', 'PERIOD_ORDER': '不能倒回已签收期重签',
 }
 
 REASONS.update({'TREE_FORMAT': '树木事件无效', 'TREE_CONFLICT': '同日状态冲突', 'TREE_NO_EVENTS': '验收日前无事件', 'TREE_SEQUENCE': '事件顺序无效', 'DATE': '日期格式无效', 'REV_BLOCKED': '较新来源尚未采信'})
+REASONS.update({'TOP_UP': '应补付', 'CLAWBACK': '应扣回', 'SETTLED': '本期结清', 'BLOCKED': '待核', 'STALE_REVISION': '旧修订已结', 'DUPLICATE': '本期已签收'})

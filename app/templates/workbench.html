@@ -43,6 +43,12 @@
         <div class="actions"><label>结论 <select id="decision"><option>确认</option><option>退回</option></select></label>
         <button class="btn btn--primary" type="submit">提交复核</button></div>
       </form>
+      <form id="settle" class="panel__body" hidden>
+        <label>结算期 <input id="settle-period" maxlength="7" placeholder="YYYY-MM" size="8"></label>
+        <label>签收意见 <textarea id="settle-note" maxlength="500" rows="2"></textarea></label>
+        <div class="actions"><button class="btn btn--primary" type="submit">签收差额</button>
+        <output id="settle-total"></output></div>
+      </form>
     </section>
 
     <section class="panel source" aria-labelledby="input-title">

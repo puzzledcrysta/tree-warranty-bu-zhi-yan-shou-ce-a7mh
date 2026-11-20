@@ -40,7 +40,7 @@ function notice(message, error = false) {
 }
 
 function tag(code) {
-  return el('span', settings.reasons[code] || code, code === 'MATCH' ? 'state' : 'state problem');
+  return el('span', settings.reasons[code] || code, ['MATCH','SETTLED'].includes(code) ? 'state' : 'state problem');
 }
 
 
@@ -93,6 +93,7 @@ async function render() {
   const stage = selected;
   byId('phase').textContent = settings.tabs[stage];
   byId('review').hidden = true;
+  byId('settle').hidden = true;
   for (const link of links) {
     if (link.dataset.module === stage) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
@@ -113,6 +114,21 @@ async function render() {
     } else if (stage === 'reconcile') {
       view = [key, ['实际', 'amount', 'num'], ['外部账', 'reference', 'num'], ['差值', 'delta', 'num'], ['外部行', 'book_line', 'num'], ['结论', row => tag(row.code)]];
       rows = [...result.book.rows].sort((a,b) => Number(a.code === 'MATCH') - Number(b.code === 'MATCH'));
+    } else if (stage === 'settle') {
+      const typed = byId('settle-period').value.trim();
+      const path = `/api/settle/${id}${/^\d{4}-\d{2}$/.test(typed) ? `?period=${encodeURIComponent(typed)}` : ''}`;
+      const plan = await query(path);
+      view = [key, ['期', 'period'], ['已付', 'paid', 'num'], ['应付', 'payable', 'num'],
+              ['差额', 'due', 'num'], ['判定', row => tag(row.code)],
+              ['说明', row => row.blocked ? row.blocked.detail : row.code === 'STALE_REVISION' ? '旧批次不再补付' : '']];
+      rows = plan.rows;
+      if (ticket === renderEpoch) {
+        byId('settle').hidden = false;
+        byId('settle-period').placeholder = `${plan.period}（留空按各笔到期期）`;
+        byId('settle-total').textContent =
+          `应补 ${plan.totals.top_up} · 应扣 ${plan.totals.clawback} · 已付 ${plan.totals.paid} · ` +
+          `待核 ${plan.totals.blocked} 笔 / 已付待核 ${plan.totals.held}`;
+      }
     } else if (stage === 'intake') {
       const intake = await query('/api/intake', inputs);
       view = [line, ['分类', 'kind'], ['字段', raw]];
@@ -237,6 +253,22 @@ byId('review').addEventListener('submit', async event => {
     await query(`/api/review/${id}`, {version: reviewVersion, decision: byId('decision').value, note: note.value});
     notice('复核已登记');
     note.value = '';
+    await render();
+  } catch (error) {
+    notice(error.message, true);
+    if (error.status === 409) await render();
+  }
+});
+byId('settle').addEventListener('submit', async event => {
+  event.preventDefault();
+  const id = result.manifest.run_id;
+  try {
+    const signed = await query(`/api/settle/${id}`, {
+      period: byId('settle-period').value.trim() || null, note: byId('settle-note').value,
+    });
+    notice(`已签收 ${signed.signed.length} 笔，跳过 ${signed.skipped.length} 笔`);
+    byId('settle-note').value = '';
+    byId('settle-period').value = '';
     await render();
   } catch (error) {
     notice(error.message, true);

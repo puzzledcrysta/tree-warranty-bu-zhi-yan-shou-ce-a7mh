@@ -15,6 +15,7 @@
 | M5 养护台账 | 核对独立清单和各类差异 | `POST /api/reconcile` | `app/modules/reconcile/service.py` | `tests/test_reconcile.py` |
 | M6 验收批次 | 打开历史批次并对原文件复跑 | `POST /api/runs` | `app/modules/runs/service.py` | `tests/test_runs.py` |
 | M7 签收底稿 | 登记复核结论并下载证据 | `POST /api/review/{run_id}` | `app/modules/review/decisions.py` | `tests/test_review.py` |
+| M8 分期签收 | 核对每期应补应扣并签收差额 | `POST /api/settle/{run_id}` | `app/modules/settle/service.py` | `tests/test_settle.py` |
 
 ## 陷阱登记
 
@@ -34,6 +35,11 @@
 | TRAP-18 | 空文件、空白文件与仅表头 | 测试构造 | `app/modules/intake/service.py` | `tests/test_intake.py::test_empty_states` |
 | TRAP-26 | 陈旧复核版本拒绝 | 测试构造 | `app/modules/review/decisions.py` | `tests/test_review.py::test_stale` |
 | TRAP-114 | replant resets | cases.csv | `app/modules/domain/rule.py` | `tests/test_domain.py::test_replant_resets` |
+| TRAP-201 | 补交修订改应付 | 测试构造 | `app/modules/settle/service.py` | `tests/test_settle.py::test_late_correction_is_clawed_back_next_period` |
+| TRAP-202 | 差额签收后才计入已付 | 测试构造 | `app/modules/settle/service.py` | `tests/test_settle.py::test_signed_difference_becomes_paid` |
+| TRAP-203 | 复算重试不重复补扣 | 测试构造 | `app/modules/settle/service.py` | `tests/test_settle.py::test_recomputed_retry_does_not_repeat_clawback` |
+| TRAP-204 | 旧签收保留当时金额 | 测试构造 | `app/modules/settle/service.py` | `tests/test_settle.py::test_earlier_signoff_keeps_original_amount` |
+| TRAP-205 | 重开旧批次不反向补付 | 测试构造 | `app/modules/settle/service.py` | `tests/test_settle.py::test_reopened_old_batch_cannot_top_up_again` |
 
 ## 对账
 

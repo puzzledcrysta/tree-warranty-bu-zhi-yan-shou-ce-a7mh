@@ -44,3 +44,25 @@ def test_export_carries_source_evidence(client,anchor):
 def test_decision_reaches_export(client,anchor):
     assert review(client,anchor).status_code==200
     assert client.get(f'/api/export/{anchor}').json()['review'][0]['decision']=='确认'
+
+
+def test_export_carries_signed_amounts(client,anchor):
+    assert client.get(f'/api/export/{anchor}').json()['signoffs']==[]
+    assert client.post(f'/api/settle/{anchor}',json={'period':'2026-11','note':'签收'}).json()['signed']
+    proof = client.get(f'/api/export/{anchor}').json()
+    first = next(item for item in proof['signoffs'] if item['business_key']=='00101')
+    assert (first['period'],first['amount'],first['note'])==('2026-11','240.00','签收')
+    assert len(proof['signoffs'])==18
+
+
+def test_export_keeps_earlier_signoffs(client,anchor):
+    client.post(f'/api/settle/{anchor}',json={'period':'2026-11'})
+    from pathlib import Path
+    payload = Path(__file__).resolve().parents[1]/'sample_data/shift.csv'
+    text = payload.read_text(encoding='utf-8-sig').replace(
+        '00101,1,2026-11-18T09:30:00+08:00,2026-11-18,20,240,',
+        '00101,2,2026-11-30T09:30:00+08:00,2026-11-18,20,200,')
+    run_id = client.post('/api/runs',json={'data':text}).json()['manifest']['run_id']
+    proof = client.get(f'/api/export/{run_id}').json()
+    rows = [item for item in proof['signoffs'] if item['business_key']=='00101']
+    assert [(item['period'],item['amount'],item['payable']) for item in rows]==[('2026-11','240.00','240.00')]

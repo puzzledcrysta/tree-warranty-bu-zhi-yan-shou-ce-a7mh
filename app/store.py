@@ -13,6 +13,14 @@ CREATE TABLE IF NOT EXISTS reviews (
   decision TEXT NOT NULL, note TEXT NOT NULL, changed TEXT NOT NULL,
   PRIMARY KEY(run_id,version)
 );
+CREATE TABLE IF NOT EXISTS signoffs (
+  id TEXT PRIMARY KEY, run_id TEXT NOT NULL REFERENCES runs(id),
+  business_key TEXT NOT NULL, period TEXT NOT NULL, kind TEXT NOT NULL,
+  amount TEXT NOT NULL, paid_before TEXT NOT NULL, payable TEXT NOT NULL,
+  revision INTEGER, note TEXT NOT NULL, created TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS signoffs_key ON signoffs(business_key,created);
+CREATE INDEX IF NOT EXISTS signoffs_period ON signoffs(period,created);
 """
 
 
